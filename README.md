@@ -42,11 +42,13 @@ Use XCode for build the ``Testbed`` sample.
   
 ### Windows
 
+Tested Compatible with Cinder 0.9+
+
 #### Building ``liquidfun`` for Windows
-Use Visual Studio 2013 to build the static library.
+Use Visual Studio 2013/2015 to build the static library.
 
 #### Building and running ``Testbed`` sample for Windows
-Use Visual Studio 2013 for build the ``Testbed`` sample. 
+Use Visual Studio 2013/2015 to build the ``Testbed`` sample. 
 
   
 ## Screenshot
