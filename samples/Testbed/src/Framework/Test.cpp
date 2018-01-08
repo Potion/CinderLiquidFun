@@ -21,56 +21,54 @@
 #include "Main.h"
 #include <stdio.h>
 
-void DestructionListener::SayGoodbye(b2Joint* joint)
+void DestructionListener::SayGoodbye( b2Joint* joint )
 {
-	if (test->m_mouseJoint == joint)
-	{
+	if( test->m_mouseJoint == joint ) {
 		test->m_mouseJoint = NULL;
 	}
 
-	else
-	{
-		test->JointDestroyed(joint);
+	else {
+		test->JointDestroyed( joint );
 	}
 }
 
-void DestructionListener::SayGoodbye(b2ParticleGroup* group)
+void DestructionListener::SayGoodbye( b2ParticleGroup* group )
 {
-	test->ParticleGroupDestroyed(group);
+	test->ParticleGroupDestroyed( group );
 }
 
 const b2ParticleColor Test::k_ParticleColors[] = {
-	b2ParticleColor(0xff, 0x00, 0x00, 0xff), // red
-	b2ParticleColor(0x00, 0xff, 0x00, 0xff), // green
-	b2ParticleColor(0x00, 0x00, 0xff, 0xff), // blue
-	b2ParticleColor(0xff, 0x8c, 0x00, 0xff), // orange
-	b2ParticleColor(0x00, 0xce, 0xd1, 0xff), // turquoise
-	b2ParticleColor(0xff, 0x00, 0xff, 0xff), // magenta
-	b2ParticleColor(0xff, 0xd7, 0x00, 0xff), // gold
-	b2ParticleColor(0x00, 0xff, 0xff, 0xff), // cyan
+	b2ParticleColor( 0xff, 0x00, 0x00, 0xff ), // red
+	b2ParticleColor( 0x00, 0xff, 0x00, 0xff ), // green
+	b2ParticleColor( 0x00, 0x00, 0xff, 0xff ), // blue
+	b2ParticleColor( 0xff, 0x8c, 0x00, 0xff ), // orange
+	b2ParticleColor( 0x00, 0xce, 0xd1, 0xff ), // turquoise
+	b2ParticleColor( 0xff, 0x00, 0xff, 0xff ), // magenta
+	b2ParticleColor( 0xff, 0xd7, 0x00, 0xff ), // gold
+	b2ParticleColor( 0x00, 0xff, 0xff, 0xff ), // cyan
 };
 const uint32 Test::k_ParticleColorsCount =
-	B2_ARRAY_SIZE(Test::k_ParticleColors);
+    B2_ARRAY_SIZE( Test::k_ParticleColors );
 
 Test::Test()
 {
 	const b2ParticleSystemDef particleSystemDef;
 	b2Vec2 gravity;
-	gravity.Set(0.0f, -10.0f);
-	m_world = new b2World(gravity);
-	m_particleSystem = m_world->CreateParticleSystem(&particleSystemDef);
+	gravity.Set( 0.0f, -10.0f );
+	m_world = new b2World( gravity );
+	m_particleSystem = m_world->CreateParticleSystem( &particleSystemDef );
 	m_bomb = NULL;
 	m_textLine = 30;
 	m_mouseJoint = NULL;
 	m_pointCount = 0;
 
 	m_destructionListener.test = this;
-	m_world->SetDestructionListener(&m_destructionListener);
-	m_world->SetContactListener(this);
-	m_world->SetDebugDraw(&m_debugDraw);
+	m_world->SetDestructionListener( &m_destructionListener );
+	m_world->SetContactListener( this );
+	m_world->SetDebugDraw( &m_debugDraw );
 
-	m_particleSystem->SetGravityScale(0.4f);
-	m_particleSystem->SetDensity(1.2f);
+	m_particleSystem->SetGravityScale( 0.4f );
+	m_particleSystem->SetDensity( 1.2f );
 
 	m_bombSpawning = false;
 
@@ -82,10 +80,10 @@ Test::Test()
 	m_mouseTracerVelocity = b2Vec2_zero;
 
 	b2BodyDef bodyDef;
-	m_groundBody = m_world->CreateBody(&bodyDef);
+	m_groundBody = m_world->CreateBody( &bodyDef );
 
-	memset(&m_maxProfile, 0, sizeof(b2Profile));
-	memset(&m_totalProfile, 0, sizeof(b2Profile));
+	memset( &m_maxProfile, 0, sizeof( b2Profile ) );
+	memset( &m_totalProfile, 0, sizeof( b2Profile ) );
 
 	m_particleParameters = NULL;
 }
@@ -98,12 +96,11 @@ Test::~Test()
 	RestoreParticleParameters();
 }
 
-void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+void Test::PreSolve( b2Contact* contact, const b2Manifold* oldManifold )
 {
 	const b2Manifold* manifold = contact->GetManifold();
 
-	if (manifold->pointCount == 0)
-	{
+	if( manifold->pointCount == 0 ) {
 		return;
 	}
 
@@ -111,13 +108,12 @@ void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 	b2Fixture* fixtureB = contact->GetFixtureB();
 
 	b2PointState state1[b2_maxManifoldPoints], state2[b2_maxManifoldPoints];
-	b2GetPointStates(state1, state2, oldManifold, manifold);
+	b2GetPointStates( state1, state2, oldManifold, manifold );
 
 	b2WorldManifold worldManifold;
-	contact->GetWorldManifold(&worldManifold);
+	contact->GetWorldManifold( &worldManifold );
 
-	for (int32 i = 0; i < manifold->pointCount && m_pointCount < k_maxContactPoints; ++i)
-	{
+	for( int32 i = 0; i < manifold->pointCount && m_pointCount < k_maxContactPoints; ++i ) {
 		ContactPoint* cp = m_points + m_pointCount;
 		cp->fixtureA = fixtureA;
 		cp->fixtureB = fixtureB;
@@ -131,188 +127,188 @@ void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 	}
 }
 
-void Test::DrawTitle(const char *string)
+void Test::DrawTitle( const char* string )
 {
-    m_debugDraw.DrawString(5, DRAW_STRING_NEW_LINE, string);
-    m_textLine = 2 * DRAW_STRING_NEW_LINE;
+	m_debugDraw.DrawString( 5, DRAW_STRING_NEW_LINE, string );
+	m_textLine = 2 * DRAW_STRING_NEW_LINE;
 }
 
 class QueryCallback : public b2QueryCallback
 {
-public:
-	QueryCallback(const b2Vec2& point)
-	{
-		m_point = point;
-		m_fixture = NULL;
-	}
-
-	bool ReportFixture(b2Fixture* fixture)
-	{
-		b2Body* body = fixture->GetBody();
-		if (body->GetType() == b2_dynamicBody)
+	public:
+		QueryCallback( const b2Vec2& point )
 		{
-			bool inside = fixture->TestPoint(m_point);
-			if (inside)
-			{
-				m_fixture = fixture;
-
-				// We are done, terminate the query.
-				return false;
-			}
+			m_point = point;
+			m_fixture = NULL;
 		}
 
-		// Continue the query.
-		return true;
-	}
+		bool ReportFixture( b2Fixture* fixture )
+		{
+			b2Body* body = fixture->GetBody();
 
-	b2Vec2 m_point;
-	b2Fixture* m_fixture;
+			if( body->GetType() == b2_dynamicBody ) {
+				bool inside = fixture->TestPoint( m_point );
+
+				if( inside ) {
+					m_fixture = fixture;
+
+					// We are done, terminate the query.
+					return false;
+				}
+			}
+
+			// Continue the query.
+			return true;
+		}
+
+		b2Vec2 m_point;
+		b2Fixture* m_fixture;
 };
 
 class QueryCallback2 : public b2QueryCallback
 {
-public:
-	QueryCallback2(b2ParticleSystem* particleSystem,
-				   const b2Shape* shape, const b2Vec2& velocity)
-	{
-		m_particleSystem = particleSystem;
-		m_shape = shape;
-		m_velocity = velocity;
-	}
-
-	bool ReportFixture(b2Fixture* fixture)
-	{
-		B2_NOT_USED(fixture);
-		return false;
-	}
-
-	bool ReportParticle(const b2ParticleSystem* particleSystem, int32 index)
-	{
-		if (particleSystem != m_particleSystem)
-			return false;
-
-		b2Transform xf;
-		xf.SetIdentity();
-		b2Vec2 p = m_particleSystem->GetPositionBuffer()[index];
-		if (m_shape->TestPoint(xf, p))
+	public:
+		QueryCallback2( b2ParticleSystem* particleSystem,
+		                const b2Shape* shape, const b2Vec2& velocity )
 		{
-			b2Vec2& v = m_particleSystem->GetVelocityBuffer()[index];
-			v = m_velocity;
+			m_particleSystem = particleSystem;
+			m_shape = shape;
+			m_velocity = velocity;
 		}
-		return true;
-	}
 
-	b2ParticleSystem* m_particleSystem;
-	const b2Shape* m_shape;
-	b2Vec2 m_velocity;
+		bool ReportFixture( b2Fixture* fixture )
+		{
+			B2_NOT_USED( fixture );
+			return false;
+		}
+
+		bool ReportParticle( const b2ParticleSystem* particleSystem, int32 index )
+		{
+			if( particleSystem != m_particleSystem ) {
+				return false;
+			}
+
+			b2Transform xf;
+			xf.SetIdentity();
+			b2Vec2 p = m_particleSystem->GetPositionBuffer()[index];
+
+			if( m_shape->TestPoint( xf, p ) ) {
+				b2Vec2& v = m_particleSystem->GetVelocityBuffer()[index];
+				v = m_velocity;
+			}
+
+			return true;
+		}
+
+		b2ParticleSystem* m_particleSystem;
+		const b2Shape* m_shape;
+		b2Vec2 m_velocity;
 };
 
-void Test::MouseDown(const b2Vec2& p)
+void Test::MouseDown( const b2Vec2& p )
 {
 	m_mouseWorld = p;
 	m_mouseTracing = true;
 	m_mouseTracerPosition = p;
 	m_mouseTracerVelocity = b2Vec2_zero;
 
-	if (m_mouseJoint != NULL)
-	{
+	if( m_mouseJoint != NULL ) {
 		return;
 	}
 
 	// Make a small box.
 	b2AABB aabb;
 	b2Vec2 d;
-	d.Set(0.001f, 0.001f);
+	d.Set( 0.001f, 0.001f );
 	aabb.lowerBound = p - d;
 	aabb.upperBound = p + d;
 
 	// Query the world for overlapping shapes.
-	QueryCallback callback(p);
-	m_world->QueryAABB(&callback, aabb);
+	QueryCallback callback( p );
+	m_world->QueryAABB( &callback, aabb );
 
-	if (callback.m_fixture)
-	{
+	if( callback.m_fixture ) {
 		b2Body* body = callback.m_fixture->GetBody();
 		b2MouseJointDef md;
 		md.bodyA = m_groundBody;
 		md.bodyB = body;
 		md.target = p;
 		md.maxForce = 1000.0f * body->GetMass();
-		m_mouseJoint = (b2MouseJoint*)m_world->CreateJoint(&md);
-		body->SetAwake(true);
+		m_mouseJoint = ( b2MouseJoint* )m_world->CreateJoint( &md );
+		body->SetAwake( true );
 	}
 }
 
-void Test::SpawnBomb(const b2Vec2& worldPt)
+void Test::SpawnBomb( const b2Vec2& worldPt )
 {
 	m_bombSpawnPoint = worldPt;
 	m_bombSpawning = true;
 }
 
-void Test::CompleteBombSpawn(const b2Vec2& p)
+void Test::CompleteBombSpawn( const b2Vec2& p )
 {
-	if (m_bombSpawning == false)
-	{
+	if( m_bombSpawning == false ) {
 		return;
 	}
 
 	const float multiplier = 30.0f;
 	b2Vec2 vel = m_bombSpawnPoint - p;
 	vel *= multiplier;
-	LaunchBomb(m_bombSpawnPoint,vel);
+	LaunchBomb( m_bombSpawnPoint, vel );
 	m_bombSpawning = false;
 }
 
-void Test::ShiftMouseDown(const b2Vec2& p)
+void Test::ShiftMouseDown( const b2Vec2& p )
 {
 	m_mouseWorld = p;
 
-	if (m_mouseJoint != NULL)
-	{
+	if( m_mouseJoint != NULL ) {
 		return;
 	}
 
-	SpawnBomb(p);
+	SpawnBomb( p );
 }
 
-void Test::MouseUp(const b2Vec2& p)
+void Test::MouseUp( const b2Vec2& p )
 {
 	m_mouseTracing = false;
 
-	if (m_mouseJoint)
-	{
-		m_world->DestroyJoint(m_mouseJoint);
+	if( m_mouseJoint ) {
+		m_world->DestroyJoint( m_mouseJoint );
 		m_mouseJoint = NULL;
 	}
 
-	if (m_bombSpawning)
-	{
-		CompleteBombSpawn(p);
+	if( m_bombSpawning ) {
+		CompleteBombSpawn( p );
 	}
 }
 
-void Test::MouseMove(const b2Vec2& p)
+void Test::MouseMove( const b2Vec2& p )
 {
 	m_mouseWorld = p;
 
-	if (m_mouseJoint)
-	{
-		m_mouseJoint->SetTarget(p);
+	if( m_mouseJoint ) {
+		m_mouseJoint->SetTarget( p );
 	}
+}
+
+
+void Test::Update()
+{
+
 }
 
 void Test::LaunchBomb()
 {
-	b2Vec2 p(RandomFloat(-15.0f, 15.0f), 30.0f);
+	b2Vec2 p( RandomFloat( -15.0f, 15.0f ), 30.0f );
 	b2Vec2 v = -5.0f * p;
-	LaunchBomb(p, v);
+	LaunchBomb( p, v );
 }
 
-void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
+void Test::LaunchBomb( const b2Vec2& position, const b2Vec2& velocity )
 {
-	if (m_bomb)
-	{
-		m_world->DestroyBody(m_bomb);
+	if( m_bomb ) {
+		m_world->DestroyBody( m_bomb );
 		m_bomb = NULL;
 	}
 
@@ -320,8 +316,8 @@ void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 	bd.type = b2_dynamicBody;
 	bd.position = position;
 	bd.bullet = true;
-	m_bomb = m_world->CreateBody(&bd);
-	m_bomb->SetLinearVelocity(velocity);
+	m_bomb = m_world->CreateBody( &bd );
+	m_bomb->SetLinearVelocity( velocity );
 
 	b2CircleShape circle;
 	circle.m_radius = 0.3f;
@@ -331,32 +327,29 @@ void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 	fd.density = 20.0f;
 	fd.restitution = 0.0f;
 
-	b2Vec2 minV = position - b2Vec2(0.3f,0.3f);
-	b2Vec2 maxV = position + b2Vec2(0.3f,0.3f);
+	b2Vec2 minV = position - b2Vec2( 0.3f, 0.3f );
+	b2Vec2 maxV = position + b2Vec2( 0.3f, 0.3f );
 
 	b2AABB aabb;
 	aabb.lowerBound = minV;
 	aabb.upperBound = maxV;
 
-	m_bomb->CreateFixture(&fd);
+	m_bomb->CreateFixture( &fd );
 }
 
-void Test::Step(Settings* settings)
+void Test::Step( Settings* settings )
 {
-	float32 timeStep = settings->hz > 0.0f ? 1.0f / settings->hz : float32(0.0f);
+	float32 timeStep = settings->hz > 0.0f ? 1.0f / settings->hz : float32( 0.0f );
 
-	if (settings->pause)
-	{
-		if (settings->singleStep)
-		{
+	if( settings->pause ) {
+		if( settings->singleStep ) {
 			settings->singleStep = 0;
 		}
-		else
-		{
+		else {
 			timeStep = 0.0f;
 		}
 
-		m_debugDraw.DrawString(5, m_textLine, "****PAUSED****");
+		m_debugDraw.DrawString( 5, m_textLine, "****PAUSED****" );
 		m_textLine += DRAW_STRING_NEW_LINE;
 	}
 
@@ -366,64 +359,62 @@ void Test::Step(Settings* settings)
 	flags += settings->drawJoints			* b2Draw::e_jointBit;
 	flags += settings->drawAABBs			* b2Draw::e_aabbBit;
 	flags += settings->drawCOMs				* b2Draw::e_centerOfMassBit;
-	m_debugDraw.SetFlags(flags);
+	m_debugDraw.SetFlags( flags );
 
-	m_world->SetAllowSleeping(settings->enableSleep > 0);
-	m_world->SetWarmStarting(settings->enableWarmStarting > 0);
-	m_world->SetContinuousPhysics(settings->enableContinuous > 0);
-	m_world->SetSubStepping(settings->enableSubStepping > 0);
-	m_particleSystem->SetStrictContactCheck(settings->strictContacts > 0);
+	m_world->SetAllowSleeping( settings->enableSleep > 0 );
+	m_world->SetWarmStarting( settings->enableWarmStarting > 0 );
+	m_world->SetContinuousPhysics( settings->enableContinuous > 0 );
+	m_world->SetSubStepping( settings->enableSubStepping > 0 );
+	m_particleSystem->SetStrictContactCheck( settings->strictContacts > 0 );
 
 	m_pointCount = 0;
 
 	b2Timer timer;
-	m_world->Step(timeStep,
-		settings->velocityIterations,
-		settings->positionIterations,
-		settings->particleIterations);
+	m_world->Step( timeStep,
+	               settings->velocityIterations,
+	               settings->positionIterations,
+	               settings->particleIterations );
 	settings->stepTimeOut = timer.GetMilliseconds();
 
 	m_world->DrawDebugData();
 
-	if (timeStep > 0.0f)
-	{
+	if( timeStep > 0.0f ) {
 		++m_stepCount;
 	}
 
-	if (settings->drawStats)
-	{
+	if( settings->drawStats ) {
 		int32 bodyCount = m_world->GetBodyCount();
 		int32 contactCount = m_world->GetContactCount();
 		int32 jointCount = m_world->GetJointCount();
-		m_debugDraw.DrawString(5, m_textLine, "bodies/contacts/joints = %d/%d/%d", bodyCount, contactCount, jointCount);
+		m_debugDraw.DrawString( 5, m_textLine, "bodies/contacts/joints = %d/%d/%d", bodyCount, contactCount, jointCount );
 		m_textLine += DRAW_STRING_NEW_LINE;
 
 		int32 particleCount = m_particleSystem->GetParticleCount();
 		int32 groupCount = m_particleSystem->GetParticleGroupCount();
 		int32 pairCount = m_particleSystem->GetPairCount();
 		int32 triadCount = m_particleSystem->GetTriadCount();
-		m_debugDraw.DrawString(5, m_textLine, "particles/groups/pairs/triads = %d/%d/%d/%d", particleCount, groupCount, pairCount, triadCount);
+		m_debugDraw.DrawString( 5, m_textLine, "particles/groups/pairs/triads = %d/%d/%d/%d", particleCount, groupCount, pairCount, triadCount );
 		m_textLine += DRAW_STRING_NEW_LINE;
 
 		int32 proxyCount = m_world->GetProxyCount();
 		int32 height = m_world->GetTreeHeight();
 		int32 balance = m_world->GetTreeBalance();
 		float32 quality = m_world->GetTreeQuality();
-		m_debugDraw.DrawString(5, m_textLine, "proxies/height/balance/quality = %d/%d/%d/%g", proxyCount, height, balance, quality);
+		m_debugDraw.DrawString( 5, m_textLine, "proxies/height/balance/quality = %d/%d/%d/%g", proxyCount, height, balance, quality );
 		m_textLine += DRAW_STRING_NEW_LINE;
 	}
 
 	// Track maximum profile times
 	{
 		const b2Profile& p = m_world->GetProfile();
-		m_maxProfile.step = b2Max(m_maxProfile.step, p.step);
-		m_maxProfile.collide = b2Max(m_maxProfile.collide, p.collide);
-		m_maxProfile.solve = b2Max(m_maxProfile.solve, p.solve);
-		m_maxProfile.solveInit = b2Max(m_maxProfile.solveInit, p.solveInit);
-		m_maxProfile.solveVelocity = b2Max(m_maxProfile.solveVelocity, p.solveVelocity);
-		m_maxProfile.solvePosition = b2Max(m_maxProfile.solvePosition, p.solvePosition);
-		m_maxProfile.solveTOI = b2Max(m_maxProfile.solveTOI, p.solveTOI);
-		m_maxProfile.broadphase = b2Max(m_maxProfile.broadphase, p.broadphase);
+		m_maxProfile.step = b2Max( m_maxProfile.step, p.step );
+		m_maxProfile.collide = b2Max( m_maxProfile.collide, p.collide );
+		m_maxProfile.solve = b2Max( m_maxProfile.solve, p.solve );
+		m_maxProfile.solveInit = b2Max( m_maxProfile.solveInit, p.solveInit );
+		m_maxProfile.solveVelocity = b2Max( m_maxProfile.solveVelocity, p.solveVelocity );
+		m_maxProfile.solvePosition = b2Max( m_maxProfile.solvePosition, p.solvePosition );
+		m_maxProfile.solveTOI = b2Max( m_maxProfile.solveTOI, p.solveTOI );
+		m_maxProfile.broadphase = b2Max( m_maxProfile.broadphase, p.broadphase );
 
 		m_totalProfile.step += p.step;
 		m_totalProfile.collide += p.collide;
@@ -435,14 +426,13 @@ void Test::Step(Settings* settings)
 		m_totalProfile.broadphase += p.broadphase;
 	}
 
-	if (settings->drawProfile)
-	{
+	if( settings->drawProfile ) {
 		const b2Profile& p = m_world->GetProfile();
 
 		b2Profile aveProfile;
-		memset(&aveProfile, 0, sizeof(b2Profile));
-		if (m_stepCount > 0)
-		{
+		memset( &aveProfile, 0, sizeof( b2Profile ) );
+
+		if( m_stepCount > 0 ) {
 			float32 scale = 1.0f / m_stepCount;
 			aveProfile.step = scale * m_totalProfile.step;
 			aveProfile.collide = scale * m_totalProfile.collide;
@@ -454,112 +444,102 @@ void Test::Step(Settings* settings)
 			aveProfile.broadphase = scale * m_totalProfile.broadphase;
 		}
 
-		m_debugDraw.DrawString(5, m_textLine, "step [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.step, aveProfile.step, m_maxProfile.step);
+		m_debugDraw.DrawString( 5, m_textLine, "step [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.step, aveProfile.step, m_maxProfile.step );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "collide [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.collide, aveProfile.collide, m_maxProfile.collide);
+		m_debugDraw.DrawString( 5, m_textLine, "collide [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.collide, aveProfile.collide, m_maxProfile.collide );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "solve [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solve, aveProfile.solve, m_maxProfile.solve);
+		m_debugDraw.DrawString( 5, m_textLine, "solve [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solve, aveProfile.solve, m_maxProfile.solve );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "solve init [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solveInit, aveProfile.solveInit, m_maxProfile.solveInit);
+		m_debugDraw.DrawString( 5, m_textLine, "solve init [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solveInit, aveProfile.solveInit, m_maxProfile.solveInit );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "solve velocity [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solveVelocity, aveProfile.solveVelocity, m_maxProfile.solveVelocity);
+		m_debugDraw.DrawString( 5, m_textLine, "solve velocity [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solveVelocity, aveProfile.solveVelocity, m_maxProfile.solveVelocity );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "solve position [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solvePosition, aveProfile.solvePosition, m_maxProfile.solvePosition);
+		m_debugDraw.DrawString( 5, m_textLine, "solve position [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solvePosition, aveProfile.solvePosition, m_maxProfile.solvePosition );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "solveTOI [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solveTOI, aveProfile.solveTOI, m_maxProfile.solveTOI);
+		m_debugDraw.DrawString( 5, m_textLine, "solveTOI [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.solveTOI, aveProfile.solveTOI, m_maxProfile.solveTOI );
 		m_textLine += DRAW_STRING_NEW_LINE;
-		m_debugDraw.DrawString(5, m_textLine, "broad-phase [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.broadphase, aveProfile.broadphase, m_maxProfile.broadphase);
+		m_debugDraw.DrawString( 5, m_textLine, "broad-phase [ave] (max) = %5.2f [%6.2f] (%6.2f)", p.broadphase, aveProfile.broadphase, m_maxProfile.broadphase );
 		m_textLine += DRAW_STRING_NEW_LINE;
 	}
 
-	if (m_mouseTracing && !m_mouseJoint)
-	{
+	if( m_mouseTracing && !m_mouseJoint ) {
 		float32 delay = 0.1f;
-		b2Vec2 acceleration = 2 / delay * (1 / delay * (m_mouseWorld - m_mouseTracerPosition) - m_mouseTracerVelocity);
+		b2Vec2 acceleration = 2 / delay * ( 1 / delay * ( m_mouseWorld - m_mouseTracerPosition ) - m_mouseTracerVelocity );
 		m_mouseTracerVelocity += timeStep * acceleration;
 		m_mouseTracerPosition += timeStep * m_mouseTracerVelocity;
 		b2CircleShape shape;
 		shape.m_p = m_mouseTracerPosition;
 		shape.m_radius = 2 * GetDefaultViewZoom();
-		QueryCallback2 callback(m_particleSystem, &shape, m_mouseTracerVelocity);
+		QueryCallback2 callback( m_particleSystem, &shape, m_mouseTracerVelocity );
 		b2AABB aabb;
 		b2Transform xf;
 		xf.SetIdentity();
-		shape.ComputeAABB(&aabb, xf, 0);
-		m_world->QueryAABB(&callback, aabb);
+		shape.ComputeAABB( &aabb, xf, 0 );
+		m_world->QueryAABB( &callback, aabb );
 	}
 
-	if (m_mouseJoint)
-	{
+	if( m_mouseJoint ) {
 		b2Vec2 p1 = m_mouseJoint->GetAnchorB();
 		b2Vec2 p2 = m_mouseJoint->GetTarget();
 
 		b2Color c;
-		c.Set(0.0f, 1.0f, 0.0f);
-		m_debugDraw.DrawPoint(p1, 4.0f, c);
-		m_debugDraw.DrawPoint(p2, 4.0f, c);
+		c.Set( 0.0f, 1.0f, 0.0f );
+		m_debugDraw.DrawPoint( p1, 4.0f, c );
+		m_debugDraw.DrawPoint( p2, 4.0f, c );
 
-		c.Set(0.8f, 0.8f, 0.8f);
-		m_debugDraw.DrawSegment(p1, p2, c);
+		c.Set( 0.8f, 0.8f, 0.8f );
+		m_debugDraw.DrawSegment( p1, p2, c );
 	}
 
-	if (m_bombSpawning)
-	{
+	if( m_bombSpawning ) {
 		b2Color c;
-		c.Set(0.0f, 0.0f, 1.0f);
-		m_debugDraw.DrawPoint(m_bombSpawnPoint, 4.0f, c);
+		c.Set( 0.0f, 0.0f, 1.0f );
+		m_debugDraw.DrawPoint( m_bombSpawnPoint, 4.0f, c );
 
-		c.Set(0.8f, 0.8f, 0.8f);
-		m_debugDraw.DrawSegment(m_mouseWorld, m_bombSpawnPoint, c);
+		c.Set( 0.8f, 0.8f, 0.8f );
+		m_debugDraw.DrawSegment( m_mouseWorld, m_bombSpawnPoint, c );
 	}
 
-	if (settings->drawContactPoints)
-	{
+	if( settings->drawContactPoints ) {
 		const float32 k_impulseScale = 0.1f;
 		const float32 k_axisScale = 0.3f;
 
-		for (int32 i = 0; i < m_pointCount; ++i)
-		{
+		for( int32 i = 0; i < m_pointCount; ++i ) {
 			ContactPoint* point = m_points + i;
 
-			if (point->state == b2_addState)
-			{
+			if( point->state == b2_addState ) {
 				// Add
-				m_debugDraw.DrawPoint(point->position, 10.0f, b2Color(0.3f, 0.95f, 0.3f));
+				m_debugDraw.DrawPoint( point->position, 10.0f, b2Color( 0.3f, 0.95f, 0.3f ) );
 			}
-			else if (point->state == b2_persistState)
-			{
+			else if( point->state == b2_persistState ) {
 				// Persist
-				m_debugDraw.DrawPoint(point->position, 5.0f, b2Color(0.3f, 0.3f, 0.95f));
+				m_debugDraw.DrawPoint( point->position, 5.0f, b2Color( 0.3f, 0.3f, 0.95f ) );
 			}
 
-			if (settings->drawContactNormals)
-			{
+			if( settings->drawContactNormals ) {
 				b2Vec2 p1 = point->position;
 				b2Vec2 p2 = p1 + k_axisScale * point->normal;
-				m_debugDraw.DrawSegment(p1, p2, b2Color(0.9f, 0.9f, 0.9f));
+				m_debugDraw.DrawSegment( p1, p2, b2Color( 0.9f, 0.9f, 0.9f ) );
 			}
-			else if (settings->drawContactImpulse)
-			{
+			else if( settings->drawContactImpulse ) {
 				b2Vec2 p1 = point->position;
 				b2Vec2 p2 = p1 + k_impulseScale * point->normalImpulse * point->normal;
-				m_debugDraw.DrawSegment(p1, p2, b2Color(0.9f, 0.9f, 0.3f));
+				m_debugDraw.DrawSegment( p1, p2, b2Color( 0.9f, 0.9f, 0.3f ) );
 			}
 
-			if (settings->drawFrictionImpulse)
-			{
-				b2Vec2 tangent = b2Cross(point->normal, 1.0f);
+			if( settings->drawFrictionImpulse ) {
+				b2Vec2 tangent = b2Cross( point->normal, 1.0f );
 				b2Vec2 p1 = point->position;
 				b2Vec2 p2 = p1 + k_impulseScale * point->tangentImpulse * tangent;
-				m_debugDraw.DrawSegment(p1, p2, b2Color(0.9f, 0.9f, 0.3f));
+				m_debugDraw.DrawSegment( p1, p2, b2Color( 0.9f, 0.9f, 0.3f ) );
 			}
 		}
 	}
 }
 
-void Test::ShiftOrigin(const b2Vec2& newOrigin)
+void Test::ShiftOrigin( const b2Vec2& newOrigin )
 {
-	m_world->ShiftOrigin(newOrigin);
+	m_world->ShiftOrigin( newOrigin );
 }
 
 float32 Test::GetDefaultViewZoom() const
@@ -572,25 +552,25 @@ float32 Test::GetDefaultViewZoom() const
 // particlesPerColor particles in the specified group.
 // If particlesPerColor is 0, the particles in the group are divided into
 // k_ParticleColorsCount equal sets of colored particles.
-void Test::ColorParticleGroup(b2ParticleGroup * const group,
-							  uint32 particlesPerColor)
+void Test::ColorParticleGroup( b2ParticleGroup* const group,
+                               uint32 particlesPerColor )
 {
-	b2Assert(group);
-	b2ParticleColor * const colorBuffer = m_particleSystem->GetColorBuffer();
+	b2Assert( group );
+	b2ParticleColor* const colorBuffer = m_particleSystem->GetColorBuffer();
 	const int32 particleCount = group->GetParticleCount();
 	const int32 groupStart = group->GetBufferIndex();
 	const int32 groupEnd = particleCount + groupStart;
-	const int32 colorCount = (int32)k_ParticleColorsCount;
-	if (!particlesPerColor)
-	{
+	const int32 colorCount = ( int32 )k_ParticleColorsCount;
+
+	if( !particlesPerColor ) {
 		particlesPerColor = particleCount / colorCount;
-		if (!particlesPerColor)
-		{
+
+		if( !particlesPerColor ) {
 			particlesPerColor = 1;
 		}
 	}
-	for (int32 i = groupStart; i < groupEnd; i++)
-	{
+
+	for( int32 i = groupStart; i < groupEnd; i++ ) {
 		colorBuffer[i] = k_ParticleColors[i / particlesPerColor];
 	}
 }
@@ -598,38 +578,38 @@ void Test::ColorParticleGroup(b2ParticleGroup * const group,
 
 // Remove particle parameters matching "filterMask" from the set of
 // particle parameters available for this test.
-void Test::InitializeParticleParameters(const uint32 filterMask)
+void Test::InitializeParticleParameters( const uint32 filterMask )
 {
 	const uint32 defaultNumValues =
-		ParticleParameter::k_defaultDefinition[0].numValues;
-	const ParticleParameter::Value * const defaultValues =
-		ParticleParameter::k_defaultDefinition[0].values;
+	    ParticleParameter::k_defaultDefinition[0].numValues;
+	const ParticleParameter::Value* const defaultValues =
+	    ParticleParameter::k_defaultDefinition[0].values;
 	m_particleParameters = new ParticleParameter::Value[defaultNumValues];
 
 	// Disable selection of wall and barrier particle types.
 	uint32 numValues = 0;
-	for (uint32 i = 0; i < defaultNumValues; i++)
-	{
-		if (defaultValues[i].value & filterMask)
-		{
+
+	for( uint32 i = 0; i < defaultNumValues; i++ ) {
+		if( defaultValues[i].value & filterMask ) {
 			continue;
 		}
-		memcpy(&m_particleParameters[numValues], &defaultValues[i],
-			   sizeof(defaultValues[0]));
+
+		memcpy( &m_particleParameters[numValues], &defaultValues[i],
+		        sizeof( defaultValues[0] ) );
 		numValues++;
 	}
+
 	m_particleParameterDef.values = m_particleParameters;
 	m_particleParameterDef.numValues = numValues;
-	TestMain::SetParticleParameters(&m_particleParameterDef, 1);
+	TestMain::SetParticleParameters( &m_particleParameterDef, 1 );
 }
 
 // Restore default particle parameters.
 void Test::RestoreParticleParameters()
 {
-	if (m_particleParameters)
-	{
+	if( m_particleParameters ) {
 		TestMain::SetParticleParameters(
-			ParticleParameter::k_defaultDefinition, 1);
+		    ParticleParameter::k_defaultDefinition, 1 );
 		delete [] m_particleParameters;
 		m_particleParameters = NULL;
 	}
