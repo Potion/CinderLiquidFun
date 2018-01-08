@@ -23,9 +23,9 @@ class SampleEntry : public Test
 				b2BodyDef  dynamicBody;
 				dynamicBody.type = b2_dynamicBody;
 				b2Body* body = m_world->CreateBody( &dynamicBody );
-				b2CircleShape  circleShape;
-				circleShape.m_p.Set( 1.f, 1.f );
-				circleShape.m_radius = 0.3f;
+				b2CircleShape  circleShape;		// cirlce shape, box shape or any shape
+				circleShape.m_p.Set( 1.f, 1.f ); // setting shape position
+				circleShape.m_radius = 0.3f; // setting shape radius
 				body->CreateFixture( &circleShape, 0.5f );
 			}
 
@@ -34,9 +34,9 @@ class SampleEntry : public Test
 			m_particleSystem->SetDamping( 0.99 );
 			{
 				// create particle in a particular shape
-				b2CircleShape shape;
-				shape.m_p.Set( 1.f, 1.f );
-				shape.m_radius = 1;
+				b2CircleShape shape;		// particle group init container size, particles will fill in this container
+				shape.m_p.Set( 1.f, 1.f ); // setting particle group location
+				shape.m_radius = 1; // setting the particle group size
 
 				b2ParticleGroupDef pd;
 				// flag is setting particle type - behaviour
@@ -56,6 +56,7 @@ class SampleEntry : public Test
 
 		void Update()
 		{
+			// update container structure in reatime
 			ground->DestroyFixture( ground->GetFixtureList() );
 
 			const b2Vec2 vertices[4] = {
