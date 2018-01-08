@@ -1,10 +1,10 @@
 #include "cinder\app\App.h"
 #include "Test.h"
 
-class DamBreak : public Test
+class SampleEntry : public Test
 {
 	public:
-		DamBreak()
+		SampleEntry()
 		{
 			{
 				const b2Vec2 vertices[4] = {
@@ -76,7 +76,7 @@ class DamBreak : public Test
 
 		static Test* Create()
 		{
-			return new DamBreak;
+			return new SampleEntry;
 		}
 
 	private:

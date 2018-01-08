@@ -145,7 +145,7 @@ class SampleEntryApp : public App
 
 void SampleEntryApp::setup()
 {
-	test = DamBreak::Create();
+	test = SampleEntry::Create();
 }
 
 void SampleEntryApp::mouseUp( MouseEvent event )
